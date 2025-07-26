@@ -4,9 +4,635 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تادريم - منصة دعم التلاميذ</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/dashboard.css">
-    <link rel="stylesheet" href="styles/assessments.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --accent: #e74c3c;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --warning: #f39c12;
+            --gray: #7f8c8d;
+            --purple: #9b59b6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* الترويسة */
+        header {
+            background: linear-gradient(135deg, var(--dark), #1a2530);
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span {
+            margin-left: 10px;
+            font-size: 2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 20px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background: #27ae60;
+        }
+        
+        .btn-accent {
+            background: var(--accent);
+        }
+        
+        .btn-accent:hover {
+            background: #c0392b;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        
+        /* القسم الرئيسي */
+        .hero {
+            background: linear-gradient(rgba(44, 62, 80, 0.9), rgba(44, 62, 80, 0.9)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1500');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon fill="rgba(255,255,255,0.03)" points="0,100 100,0 100,100"/></svg>');
+            background-size: cover;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            animation: fadeInDown 1s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            animation: fadeInUp 1s ease 0.2s;
+            animation-fill-mode: both;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero .btn {
+            animation: fadeInUp 1s ease 0.4s;
+            animation-fill-mode: both;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* الميزات */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 80px 0;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            padding: 30px;
+            border-top: 4px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .feature-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card:nth-child(2) {
+            border-top-color: var(--secondary);
+        }
+        
+        .feature-card:nth-child(2)::after {
+            background: linear-gradient(90deg, var(--secondary), transparent);
+        }
+        
+        .feature-card:nth-child(3) {
+            border-top-color: var(--accent);
+        }
+        
+        .feature-card:nth-child(3)::after {
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        
+        /* لوحة التحكم */
+        .dashboard {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 50px;
+        }
+        
+        .dashboard h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--dark);
+            font-size: 1.8rem;
+        }
+        
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .chart {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .chart h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .chart-container {
+            height: 200px;
+            position: relative;
+        }
+        
+        /* اختبارات التقييم النفسي */
+        .tests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .test-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--purple), transparent);
+        }
+        
+        .test-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .test-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--purple), #8e44ad);
+            color: white;
+            position: relative;
+        }
+        
+        .test-header h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .test-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .test-body {
+            padding: 20px;
+        }
+        
+        .test-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .test-info i {
+            margin-left: 5px;
+        }
+        
+        .test-description {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #555;
+        }
+        
+        .test-card .btn {
+            width: 100%;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+        
+        /* بنك الموارد */
+        .resources {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .resource-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .resource-icon {
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .resource-icon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--secondary), transparent);
+        }
+        
+        .resource-icon.plan { background: linear-gradient(135deg, var(--secondary), #27ae60); }
+        .resource-icon.activity { background: linear-gradient(135deg, var(--accent), #c0392b); }
+        .resource-icon.report { background: linear-gradient(135deg, var(--primary), #2980b9); }
+        .resource-icon.guide { background: linear-gradient(135deg, var(--warning), #e67e22); }
+        
+        .resource-content {
+            padding: 20px;
+        }
+        
+        .resource-content h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .resource-content p {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+        
+        /* التذييل */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 20px;
+            margin-top: 80px;
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 0;
+            width: 100%;
+            height: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0,0 Q50,10 100,0 L100,10 L0,10 Z" fill="%232c3e50"/></svg>');
+            background-size: 100% 100%;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--primary);
+        }
+        
+        .footer-section p, .footer-section li {
+            color: #bdc3c7;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        /* الرسوم المتحركة */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* التجاوب */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+        
+        .section-title {
+            text-align: center;
+            margin: 50px 0 30px;
+            color: var(--dark);
+            font-size: 2rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 50%;
+            transform: translateX(50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        /* مؤشرات التحميل */
+        .progress-container {
+            margin-top: 15px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        /* تأثيرات إضافية */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            margin: 10px;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .feature-card:nth-child(2) .feature-icon {
+            color: var(--secondary);
+        }
+        
+        .feature-card:nth-child(3) .feature-icon {
+            color: var(--accent);
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -29,28 +655,58 @@
         <div class="container">
             <h1>منصة متكاملة لدعم مستشاري التوجيه المدرسي</h1>
             <p>أداة ذكية لتحليل نتائج التلاميذ، تقديم الدعم النفسي، وتوفير موارد بيداغوجية متخصصة</p>
-            <a href="#features" class="btn">اكتشف الميزات</a>
+            <a href="#features" class="btn pulse">اكتشف الميزات</a>
         </div>
     </section>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">5,000+</div>
+                <div class="stat-label">مستفيد من المنصة</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">92%</div>
+                <div class="stat-label">رضا المستخدمين</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">1,200+</div>
+                <div class="stat-label">مورد تعليمي</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">85%</div>
+                <div class="stat-label">تحسن في النتائج</div>
+            </div>
+        </div>
+    </div>
 
     <div class="container" id="features">
         <div class="features">
             <div class="feature-card" id="predictive">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
                 <h3>التحليل التنبؤي</h3>
-                <p>نظام ذكي يتوقع صعوبات التعلم والتسرب المدرسي باستخدام خوارزميات الذكاء الاصطناعي لتحليل أنماط الأداء الدراسي</p>
+                <p>نظام ذكي يتوقع صعوبات التعلم والتسرب المدرسي باستخدام خوارزميات الذكاء الاصطناعي لتحليل أنماط الأداء الدراسي. يمكنك الحصول على تقارير مفصلة تساعدك في اتخاذ القرارات الاستباقية لدعم التلاميذ.</p>
                 <a href="#" class="btn">استعرض التقارير</a>
             </div>
             
             <div class="feature-card" id="psychological">
+                <div class="feature-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
                 <h3>التقييم النفسي</h3>
-                <p>مجموعة متكاملة من الاختبارات النفسية لتقييم الذكاء، الميول، الصحة النفسية (قلق، اكتئاب، ثقة بالنفس) بمشاركة أخصائيين</p>
-                <a href="#" class="btn">ابدأ التقييم</a>
+                <p>مجموعة متكاملة من الاختبارات النفسية لتقييم الذكاء، الميول، الصحة النفسية (قلق، اكتئاب، ثقة بالنفس) بمشاركة أخصائيين نفسيين. تم تصميم هذه الاختبارات خصيصاً للبيئة التعليمية العربية.</p>
+                <a href="#" class="btn btn-secondary">ابدأ التقييم</a>
             </div>
             
             <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-book"></i>
+                </div>
                 <h3>بنك الموارد</h3>
-                <p>مكتبة شاملة تحتوي على خطط علاجية، أنشطة تفاعلية، ونماذج جاهزة لتقارير التوجيه لدعم العملية البيداغوجية</p>
-                <a href="#resources" class="btn">استكشف الموارد</a>
+                <p>مكتبة شاملة تحتوي على خطط علاجية، أنشطة تفاعلية، ونماذج جاهزة لتقارير التوجيه لدعم العملية البيداغوجية. جميع الموارد معدة وفق المعايير التربوية الحديثة وقابلة للتخصيص.</p>
+                <a href="#resources" class="btn btn-accent">استكشف الموارد</a>
             </div>
         </div>
     </div>
@@ -61,28 +717,214 @@
             <div class="charts">
                 <div class="chart">
                     <h3>توقع صعوبات التعلم</h3>
-                    <div class="chart-placeholder">رسم بياني - توزيع صعوبات التعلم</div>
+                    <div class="chart-container">
+                        <canvas id="learningChart"></canvas>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 65%"></div>
+                    </div>
+                    <p>65% من التلاميذ يحتاجون دعمًا في الرياضيات</p>
                 </div>
                 <div class="chart">
                     <h3>مؤشر التسرب المدرسي</h3>
-                    <div class="chart-placeholder">رسم بياني - نسب التسرب المتوقعة</div>
+                    <div class="chart-container">
+                        <canvas id="dropoutChart"></canvas>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 22%"></div>
+                    </div>
+                    <p>22% من التلاميذ معرضون لخطر التسرب</p>
                 </div>
                 <div class="chart">
                     <h3>التقييم النفسي العام</h3>
-                    <div class="chart-placeholder">رسم بياني - توزيع الحالات النفسية</div>
+                    <div class="chart-container">
+                        <canvas id="mentalChart"></canvas>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: 78%"></div>
+                    </div>
+                    <p>78% من التلاميذ يتمتعون بصحة نفسية جيدة</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="container" id="psychological">
-        <h2>اختبارات التقييم النفسي</h2>
-        <div class="tests-grid"></div>
+        <h2 class="section-title">اختبارات التقييم النفسي</h2>
+        <div class="tests-grid">
+            <div class="test-card">
+                <div class="test-header">
+                    <h3>مقياس الذكاء المتعدد</h3>
+                    <p>تقييم القدرات العقلية المتعددة</p>
+                </div>
+                <div class="test-body">
+                    <div class="test-info">
+                        <span><i class="fas fa-clock"></i> 30 دقيقة</span>
+                        <span><i class="fas fa-question-circle"></i> 45 سؤال</span>
+                    </div>
+                    <div class="test-description">
+                        اختبار يقيس أنواع الذكاءات المتعددة (لغوي، منطقي، مكاني، اجتماعي، وغيرها) وفق نظرية جاردنر. يساعد في تحديد نقاط القوة والضعف لدى التلميذ.
+                    </div>
+                    <a href="#" class="btn btn-secondary">بدء الاختبار</a>
+                </div>
+            </div>
+            
+            <div class="test-card">
+                <div class="test-header">
+                    <h3>مقياس الميول المهنية</h3>
+                    <p>اكتشاف الميول والاهتمامات المهنية</p>
+                </div>
+                <div class="test-body">
+                    <div class="test-info">
+                        <span><i class="fas fa-clock"></i> 25 دقيقة</span>
+                        <span><i class="fas fa-question-circle"></i> 40 سؤال</span>
+                    </div>
+                    <div class="test-description">
+                        اختبار يساعد في تحديد ميول التلميذ المهنية واتجاهاته المستقبلية وفق نظرية هولاند. يوفر نتائج تفصيلية حول المجالات المهنية المناسبة للتلميذ.
+                    </div>
+                    <a href="#" class="btn btn-secondary">بدء الاختبار</a>
+                </div>
+            </div>
+            
+            <div class="test-card">
+                <div class="test-header">
+                    <h3>مقياس القلق المدرسي</h3>
+                    <p>تقييم مستوى القلق لدى التلاميذ</p>
+                </div>
+                <div class="test-body">
+                    <div class="test-info">
+                        <span><i class="fas fa-clock"></i> 20 دقيقة</span>
+                        <span><i class="fas fa-question-circle"></i> 30 سؤال</span>
+                    </div>
+                    <div class="test-description">
+                        اختبار مصمم لقياس مستويات القلق المرتبطة بالبيئة المدرسية والتحصيل الدراسي. يساعد في تحديد التلاميذ الذين يحتاجون دعمًا نفسيًا إضافيًا.
+                    </div>
+                    <a href="#" class="btn btn-secondary">بدء الاختبار</a>
+                </div>
+            </div>
+            
+            <div class="test-card">
+                <div class="test-header">
+                    <h3>مقياس الثقة بالنفس</h3>
+                    <p>تقييم مستوى تقدير الذات</p>
+                </div>
+                <div class="test-body">
+                    <div class="test-info">
+                        <span><i class="fas fa-clock"></i> 15 دقيقة</span>
+                        <span><i class="fas fa-question-circle"></i> 25 سؤال</span>
+                    </div>
+                    <div class="test-description">
+                        اختبار يقيس مستوى الثقة بالنفس وتقدير الذات لدى التلميذ في السياقات المختلفة. يوفر مؤشرات دقيقة عن احتياجات التلميذ لتعزيز ثقته بنفسه.
+                    </div>
+                    <a href="#" class="btn btn-secondary">بدء الاختبار</a>
+                </div>
+            </div>
+            
+            <div class="test-card">
+                <div class="test-header">
+                    <h3>مقياس المهارات الاجتماعية</h3>
+                    <p>تقييم القدرة على التفاعل الاجتماعي</p>
+                </div>
+                <div class="test-body">
+                    <div class="test-info">
+                        <span><i class="fas fa-clock"></i> 20 دقيقة</span>
+                        <span><i class="fas fa-question-circle"></i> 35 سؤال</span>
+                    </div>
+                    <div class="test-description">
+                        اختبار يقيس مهارات التواصل والتفاعل الاجتماعي لدى التلميذ. يساعد في تحديد التلاميذ الذين يحتاجون تطويرًا في مهاراتهم الاجتماعية.
+                    </div>
+                    <a href="#" class="btn btn-secondary">بدء الاختبار</a>
+                </div>
+            </div>
+            
+            <div class="test-card">
+                <div class="test-header">
+                    <h3>مقياس الضغوط الدراسية</h3>
+                    <p>تقييم مستوى التوتر المرتبط بالدراسة</p>
+                </div>
+                <div class="test-body">
+                    <div class="test-info">
+                        <span><i class="fas fa-clock"></i> 15 دقيقة</span>
+                        <span><i class="fas fa-question-circle"></i> 20 سؤال</span>
+                    </div>
+                    <div class="test-description">
+                        اختبار خاص بقياس مستوى الضغوط والتوتر الذي يعاني منه التلميذ في البيئة الدراسية. يساعد في تحديد مصادر الضغط وطرق التعامل معها.
+                    </div>
+                    <a href="#" class="btn btn-secondary">بدء الاختبار</a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="container" id="resources">
-        <h2>بنك الموارد البيداغوجية</h2>
-        <div class="resources"></div>
+        <h2 class="section-title">بنك الموارد البيداغوجية</h2>
+        <div class="resources">
+            <div class="resource-card">
+                <div class="resource-icon plan">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <div class="resource-content">
+                    <h3>الخطط العلاجية</h3>
+                    <p>مجموعة من الخطط العلاجية المصممة لمعالجة صعوبات التعلم في المواد الأساسية مثل الرياضيات واللغات والعلوم.</p>
+                    <a href="#" class="btn">تحميل المورد</a>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-icon activity">
+                    <i class="fas fa-puzzle-piece"></i>
+                </div>
+                <div class="resource-content">
+                    <h3>الأنشطة التفاعلية</h3>
+                    <p>أنشطة تعليمية تفاعلية لتنمية المهارات المختلفة لدى التلاميذ، تشمل ألعاب تعليمية وتمارين عملية.</p>
+                    <a href="#" class="btn">تحميل المورد</a>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-icon report">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="resource-content">
+                    <h3>نماذج التقارير</h3>
+                    <p>مجموعة من النماذج الجاهزة لتقارير التوجيه والتقييم النفسي، قابلة للتعديل وفق احتياجاتك.</p>
+                    <a href="#" class="btn">تحميل المورد</a>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-icon guide">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="resource-content">
+                    <h3>دلائل إرشادية</h3>
+                    <p>دلائل إرشادية للمستشارين حول التعامل مع حالات خاصة مثل صعوبات التعلم، التوحد، واضطرابات الانتباه.</p>
+                    <a href="#" class="btn">تحميل المورد</a>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-icon plan">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="resource-content">
+                    <h3>خطط الدروس</h3>
+                    <p>نماذج جاهزة لخطط الدروس اليومية والأسبوعية لجميع المواد الدراسية، معدة وفق المناهج الحديثة.</p>
+                    <a href="#" class="btn">تحميل المورد</a>
+                </div>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-icon activity">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="resource-content">
+                    <h3>فيديوهات تعليمية</h3>
+                    <p>مجموعة من الفيديوهات التعليمية التي تشرح المفاهيم الصعبة بطريقة مبسطة وجذابة للتلاميذ.</p>
+                    <a href="#" class="btn">تحميل المورد</a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer>
@@ -90,7 +932,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>عن المنصة</h3>
-                    <p>منصة متكاملة لدعم مستشاري التوجيه المدرسي في تحليل نتائج التلاميذ وتقديم الدعم النفسي والبيداغوجي.</p>
+                    <p>منصة متكاملة لدعم مستشاري التوجيه المدرسي في تحليل نتائج التلاميذ وتقديم الدعم النفسي والبيداغوجي. نسعى لتحسين جودة التعليم ودعم التلاميذ في رحلتهم التعليمية.</p>
                 </div>
                 
                 <div class="footer-section">
@@ -99,6 +941,7 @@
                         <li><a href="#predictive">التحليل التنبؤي</a></li>
                         <li><a href="#psychological">التقييم النفسي</a></li>
                         <li><a href="#resources">بنك الموارد</a></li>
+                        <li><a href="#">المدونة التعليمية</a></li>
                         <li><a href="#">اتصل بنا</a></li>
                     </ul>
                 </div>
@@ -106,21 +949,144 @@
                 <div class="footer-section">
                     <h3>الاتصال</h3>
                     <ul>
-                        <li>البريد الإلكتروني: info@tadreem.pro</li>
-                        <li>الهاتف: +212 600 000 000</li>
+                        <li><i class="fas fa-envelope"></i> البريد الإلكتروني: info@tadreem.pro</li>
+                        <li><i class="fas fa-phone"></i> الهاتف: +212 600 000 000</li>
+                        <li><i class="fas fa-map-marker-alt"></i> العنوان: الرباط، المغرب</li>
+                        <li><i class="fas fa-clock"></i> ساعات العمل: 8:00 ص - 6:00 م</li>
                     </ul>
                 </div>
             </div>
             
             <div class="copyright">
-                <p>جميع الحقوق محفوظة &copy; 2023 تادريم - منصة دعم التلاميذ</p>
+                <p>جميع الحقوق محفوظة &copy; 2023 تادريم - منصة دعم التلاميذ | تم التطوير بدعم من وزارة التربية الوطنية</p>
             </div>
         </div>
     </footer>
 
-    <script src="scripts/main.js"></script>
-    <script src="scripts/predictive.js"></script>
-    <script src="scripts/assessments.js"></script>
-    <script src="scripts/resources.js"></script>
+    <script>
+        // كود جافاسكريبت للرسوم البيانية والتفاعلية
+        document.addEventListener('DOMContentLoaded', function() {
+            // تأثير التمرير السلس للروابط
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // إضافة تأثير للبطاقات عند التمرير
+            const observerOptions = {
+                threshold: 0.1
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.feature-card, .test-card, .resource-card').forEach(card => {
+                card.style.opacity = 0;
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                observer.observe(card);
+            });
+            
+            // الرسوم البيانية
+            // رسم بياني 1: صعوبات التعلم
+            const learningCtx = document.getElementById('learningChart').getContext('2d');
+            const learningChart = new Chart(learningCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['الرياضيات', 'اللغة العربية', 'العلوم', 'اللغات الأجنبية'],
+                    datasets: [{
+                        data: [65, 40, 35, 30],
+                        backgroundColor: [
+                            '#e74c3c',
+                            '#3498db',
+                            '#2ecc71',
+                            '#f39c12'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            rtl: true
+                        }
+                    }
+                }
+            });
+            
+            // رسم بياني 2: التسرب المدرسي
+            const dropoutCtx = document.getElementById('dropoutChart').getContext('2d');
+            const dropoutChart = new Chart(dropoutCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['الصف السادس', 'الصف السابع', 'الصف الثامن', 'الصف التاسع'],
+                    datasets: [{
+                        label: 'نسبة التسرب',
+                        data: [15, 22, 28, 35],
+                        backgroundColor: '#9b59b6',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 50,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // رسم بياني 3: التقييم النفسي
+            const mentalCtx = document.getElementById('mentalChart').getContext('2d');
+            const mentalChart = new Chart(mentalCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['الثقة بالنفس', 'الذكاء العاطفي', 'المهارات الاجتماعية', 'التكيف مع الضغوط', 'الدافعية'],
+                    datasets: [{
+                        label: 'مستوى الصحة النفسية',
+                        data: [75, 82, 68, 78, 85],
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderColor: '#3498db',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#3498db'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
